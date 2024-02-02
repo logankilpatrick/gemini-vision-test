@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Image Upload</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .image-preview {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container py-5">
+      <h2 class="mb-4">Upload an Image</h2>
+      <form
+        action="/upload"
+        method="post"
+        enctype="multipart/form-data"
+        id="upload-form"
+        class="form-inline"
+      >
+        <div class="form-group mr-2">
+          <input
+            type="file"
+            name="image"
+            accept="image/png"
+            class="form-control-file"
+            id="image-input"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Image</button>
+      </form>
+      <div id="image-preview-container" class="mt-4"></div>
+      <div id="output-container" class="mt-2"></div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      document
+        .getElementById("upload-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          fetch("/upload", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.text())
+            .then((data) => {
+              const imagePreviewContainer = document.getElementById(
+                "image-preview-container"
+              );
+              const outputContainer =
+                document.getElementById("output-container");
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                imagePreviewContainer.innerHTML =
+                  '<img src="' +
+                  e.target.result +
+                  '" class="image-preview" alt="Uploaded Image">';
+              };
+              reader.readAsDataURL(
+                document.getElementById("image-input").files[0]
+              );
+              outputContainer.innerHTML = '<p class="lead">' + data + "</p>";
+            })
+            .catch((error) => console.error("Error:", error));
+        });
+    </script>
+  </body>
+</html>
